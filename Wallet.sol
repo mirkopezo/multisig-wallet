@@ -3,7 +3,6 @@ pragma solidity 0.6.0;
 contract Wallet {
     address[] public approvers;
     uint public quorum;
-    uint public nextId;
 
     struct Transfer {
         uint id;
@@ -13,7 +12,7 @@ contract Wallet {
         bool sent; 
     }
 
-    mapping(uint => Transfer) public transfers;
+    Transfer[] public transfers;
     
     constructor(address[] memory _approvers, uint _quorum) public {
         approvers = _approvers;
@@ -25,13 +24,12 @@ contract Wallet {
     }
 
     function createTransfer(uint amount, address payable to) external {
-        transfers[nextId] = Transfer(
-            nextId, 
-            amount, 
-            to, 
-            0, 
-            false 
-        );
-        nextId++;
+        transfers.push(Transfer(
+            transfers.length,
+            amount,
+            to,
+            0,
+            false
+        ));
     }
 }
