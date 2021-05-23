@@ -1,4 +1,5 @@
 pragma solidity 0.6.0;
+pragma experimental ABIEncoderV2;
 
 contract Wallet {
     address[] public approvers;
@@ -13,7 +14,7 @@ contract Wallet {
     }
 
     Transfer[] public transfers;
-    
+
     constructor(address[] memory _approvers, uint _quorum) public {
         approvers = _approvers;
         quorum = _quorum;
@@ -21,6 +22,10 @@ contract Wallet {
 
     function getApprovers() external view returns(address[] memory) {
         return approvers; 
+    }
+    
+    function getTransfers() external view returns(Transfer[] memory) {
+        return transfers; 
     }
 
     function createTransfer(uint amount, address payable to) external {
