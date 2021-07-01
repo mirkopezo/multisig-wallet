@@ -30,7 +30,7 @@ contract Wallet {
         return transfers; 
     }
 
-    function createTransfer(uint amount, address payable to) external {
+    function createTransfer(uint amount, address payable to) external onlyApprover() {
         transfers.push(Transfer(
             transfers.length,
             amount,
@@ -40,7 +40,7 @@ contract Wallet {
         ));
     }
 
-    function approveTransfer(uint id) external { 
+    function approveTransfer(uint id) external onlyApprover() { 
         require(transfers[id].sent == false, 'Transfer has already been sent!'); 
         require(approvals[msg.sender][id] == false, 'Cannot approve transfer twice!');
         approvals[msg.sender][id] = true;
@@ -55,4 +55,15 @@ contract Wallet {
     }
     
     receive() external payable {}
+
+    modifier onlyApprover() {
+        bool allowed = false;
+        for(uint i = 0; i < approvers.length; i++){
+            if(approvers[i] == msg.sender) {
+                allowed = true;
+            }
+        }
+        require(allowed == true, 'Only approvers are allowed!');
+        _;
+    }    
 }
