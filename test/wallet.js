@@ -57,4 +57,22 @@ contract('Wallet', (accounts) => {
         const transfers = await wallet.getTransfers();
         assert(transfers[0].sent == true);
     });
+
+    it('Should not approve transfer if sender is not approved', async() => {
+        await wallet.createTransfer(100, accounts[6], {from: accounts[0]});
+        await expectRevert(wallet.approveTransfer(0, {from: accounts[5]}), 'Only approvers are allowed!');
+    }); 
+
+    it('Should not approve transfer if transfer is already sent', async() => {
+        await wallet.createTransfer(100, accounts[6], {from: accounts[0]});
+        await wallet.approveTransfer(0, {from: accounts[0]});
+        await wallet.approveTransfer(0, {from: accounts[1]});
+        await expectRevert(wallet.approveTransfer(0, {from: accounts[2]}), 'Transfer has already been sent!');
+    });
+
+    it('Should not approve transfer if sender tries to approve it twice', async() => {
+        await wallet.createTransfer(100, accounts[6], {from: accounts[0]});
+        await wallet.approveTransfer(0, {from: accounts[0]});
+        await expectRevert(wallet.approveTransfer(0, {from: accounts[0]}), 'Cannot approve transfer twice!');
+    });
 });
