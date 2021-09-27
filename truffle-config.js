@@ -19,6 +19,9 @@
  */
 
 const path = require('path');
+const provider = require('@truffle/hdwallet-provider');
+const fs = require('fs');
+const secrets = JSON.parse(fs.readFileSync('.secrets.json').toString().trim());
 // const HDWalletProvider = require('@truffle/hdwallet-provider');
 // const infuraKey = "fj4jll3k.....";
 //
@@ -75,6 +78,16 @@ module.exports = {
     // network_id: 2111,   // This network is yours, in the cloud.
     // production: true    // Treats this network as if it was a public net. (default: false)
     // }
+    rinkeby: {
+        provider: () => 
+            new provider(
+                secrets.privateKeys,
+                'wss://rinkeby.infura.io/ws/v3/8d65382602524ab5b4bc1adc3c346c61',
+                0,
+                3
+            ),
+            networkId: "4",
+    }
   },
 
   // Set default mocha options here, use special reporters etc.
