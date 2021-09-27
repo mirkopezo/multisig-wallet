@@ -86,7 +86,7 @@ module.exports = {
                 0,
                 3
             ),
-            networkId: "4",
+            network_id: "4",
     }
   },
 
