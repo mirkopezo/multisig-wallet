@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { getWeb3, getWallet } from './utils';
-import Header from './Header.js';
-import NewTransfer from './NewTransfer';
-import TransferList from './TransferList';
+import { AppBar, CssBaseline, Toolbar, Typography } from '@material-ui/core';
+import Header from 'components/Header/Header';
+import NewTransfer from 'components/NewTransfer/NewTransfer';
+import TransferList from 'components/TransferList/TransferList';
 
 function App() {
   const [web3, setWeb3] = useState(undefined);
@@ -11,6 +12,7 @@ function App() {
   const [approvers, setApprovers] = useState([]);
   const [quorum, setQuorum] = useState(undefined);
   const [transfers, setTransfers] = useState([]);
+  
   useEffect(() => {
     const init = async () => {
       const web3 = await getWeb3();
@@ -52,12 +54,21 @@ function App() {
   }
 
   return (
-    <div>
-      MultiSig Dapp
-      <Header approvers={approvers} quorum={quorum} />
-      <NewTransfer createTransfer={createTransfer} />
-      <TransferList transfers={transfers} approveTransfer={approveTransfer} />
-    </div>
+    <>
+        <CssBaseline />
+        <AppBar position="relative">
+        <Toolbar>
+            <Typography variant="h6">
+                Multi-Signature Wallet
+            </Typography>
+        </Toolbar>
+        </AppBar>
+        <div>
+        <Header approvers={approvers} quorum={quorum} />
+        <NewTransfer createTransfer={createTransfer} />
+        <TransferList transfers={transfers} approveTransfer={approveTransfer} />
+        </div>
+    </>
   );
 }
 
