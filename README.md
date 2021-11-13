@@ -11,7 +11,7 @@
 </p>
 
 <p align="center">
-  <img src="https://i.ibb.co/QvP6rBH/multisig-wallet-interface.jpg" />
+  <img src="https://i.ibb.co/r29dzZj/multisig-wallet-interface.jpg" />
 </p>
 
 ## Summary
