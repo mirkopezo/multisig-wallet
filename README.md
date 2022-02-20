@@ -23,8 +23,7 @@ A Multi-Signature Wallet is wallet where you need control over multiple private 
 
     ```sh
     $ git clone https://github.com/mirkopezo/multisig-wallet.git
-    $ cd multisig-wallet
-    $ cd client
+    $ cd multisig-wallet/client
     ```
 
 2. Install Dependencies
