@@ -1,68 +1,67 @@
-pragma solidity 0.8.0;
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.7;
+
+error TransferSent();
+error TransferApproved();
+error NotAllowed();
 
 contract Wallet {
-    address[] public approvers;
-    uint public quorum;
+    address[] private approvers;
+    mapping(address => mapping(uint256 => bool)) private approvals;
+
+    Transfer[] private transfers;
+
+    uint256 public immutable quorum;
 
     struct Transfer {
-        uint id;
-        uint amount; 
-        address payable to; 
-        uint approvals; 
-        bool sent; 
+        uint256 id;
+        uint256 amount;
+        uint64 approvals;
+        address to;
+        bool sent;
     }
 
-    Transfer[] public transfers;
+    modifier onlyApprover() {
+        bool allowed = false;
+        uint256 approversLength = approvers.length;
 
-    mapping(address => mapping(uint => bool)) public approvals;
+        for (uint256 i = 0; i < approversLength; ++i) {
+            if (approvers[i] == msg.sender) {
+                allowed = true;
+            }
+        }
+        if (!allowed) revert NotAllowed();
+        _;
+    }
 
-    constructor(address[] memory _approvers, uint _quorum) {
+    constructor(address[] memory _approvers, uint256 _quorum) {
         approvers = _approvers;
         quorum = _quorum;
     }
 
-    function getApprovers() external view returns(address[] memory) {
-        return approvers; 
-    }
-    
-    function getTransfers() external view returns(Transfer[] memory) {
-        return transfers; 
-    }
-
-    function createTransfer(uint amount, address payable to) external onlyApprover() {
-        transfers.push(Transfer(
-            transfers.length,
-            amount,
-            to,
-            0,
-            false
-        ));
-    }
-
-    function approveTransfer(uint id) external onlyApprover() { 
-        require(transfers[id].sent == false, 'Transfer has already been sent!'); 
-        require(approvals[msg.sender][id] == false, 'Cannot approve transfer twice!');
-        approvals[msg.sender][id] = true;
-        transfers[id].approvals++;
-        
-        if(transfers[id].approvals >= quorum) {
-            transfers[id].sent = true;
-            address payable to = transfers[id].to;
-            uint amount = transfers[id].amount;
-            to.transfer(amount); 
-        }
-    }
-    
     receive() external payable {}
 
-    modifier onlyApprover() {
-        bool allowed = false;
-        for(uint i = 0; i < approvers.length; i++){
-            if(approvers[i] == msg.sender) {
-                allowed = true;
-            }
+    function createTransfer(uint256 amount, address to) external onlyApprover {
+        transfers.push(Transfer(transfers.length, amount, 0, to, false));
+    }
+
+    function approveTransfer(uint256 id) external onlyApprover {
+        if (transfers[id].sent) revert TransferSent();
+        if (approvals[msg.sender][id]) revert TransferApproved();
+        approvals[msg.sender][id] = true;
+        transfers[id].approvals++;
+
+        if (transfers[id].approvals >= quorum) {
+            transfers[id].sent = true;
+            payable(transfers[id].to).transfer(transfers[id].amount);
         }
-        require(allowed == true, 'Only approvers are allowed!');
-        _;
-    }    
+    }
+
+    function getApprovers() external view returns (address[] memory) {
+        return approvers;
+    }
+
+    function getTransfers() external view returns (Transfer[] memory) {
+        return transfers;
+    }
 }
